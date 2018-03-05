@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#MINECRAFT_LOC=/opt/minecraft
-MINECRAFT_LOC=/mnt/c/Users/Christopher/Documents/homeserverbs/minecraft/opt/minecraft
+MINECRAFT_LOC=/opt/minecraft
+
 DL_PAGE="https://minecraft.net/en-us/download/server"
 
 if ! [ `pwd` == ${MINECRAFT_LOC} ]; then
