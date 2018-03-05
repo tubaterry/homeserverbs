@@ -4,7 +4,7 @@
 
 #This assumes you're on Ubuntu.  And root.
 
-if ! [ ${EUID} -eq 0]; then
+if ! [ ${EUID} -eq 0 ]; then
   echo "be root first."
   exit 1
 fi
