@@ -21,10 +21,10 @@ cp minecraft/opt/minecraft/startminecraft.sh /opt/minecraft/
 cp minecraft/etc/systemd/system/minecraft-server.service /etc/systemd/system/minecraft-server.service
 
 systemctl daemon-reload
-systemctl enable minecraft
+systemctl enable minecraft-server
 
 #You really should actually read this.
 echo "eula=true" > /opt/minecraft/eula.txt
-chown -R minecraft:minecraft /opt/minecraft
+chown -R minecraft:minecraft /opt/minecraft/*
 
-echo "Run as root 'systemctl start minecraft' to begin"
+echo "Run as root 'systemctl start minecraft-server' to begin"
