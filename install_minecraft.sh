@@ -26,5 +26,6 @@ systemctl enable minecraft-server
 #You really should actually read this.
 echo "eula=true" > /opt/minecraft/eula.txt
 chown -R minecraft:minecraft /opt/minecraft/*
+chmod +x /opt/minecraft/startminecraft.sh
 
 echo "Run as root 'systemctl start minecraft-server' to begin"
