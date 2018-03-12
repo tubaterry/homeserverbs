@@ -1,8 +1,9 @@
 #!/bin/bash
 
-#MINECRAFT_LOC=/opt/minecraft
-MINECRAFT_LOC=/mnt/c/Users/Christopher/Documents/homeserverbs/minecraft/opt/minecraft
+MINECRAFT_LOC=/opt/minecraft
+
 DL_PAGE="https://minecraft.net/en-us/download/server"
+DL_KEYWORD="launcher.mojang"
 
 if ! [ `pwd` == ${MINECRAFT_LOC} ]; then
   cd $MINECRAFT_LOC
@@ -17,12 +18,11 @@ if ! [ `pwd` == ${MINECRAFT_LOC} ]; then
 fi
 
 #Minecraft is stored in an S3 bucket
-CURRENT_LINK=`curl -s $DL_PAGE | grep "Minecraft.Download" | cut -d'"' -f2`
-#this is embarassing
-CURRENT_VER=`echo $CURRENT_LINK | rev | cut -d'/' -f -1 | rev`
-INSTALLED_VER=`find . -name 'minecraft_server*.jar' -printf '%f'`
+CURRENT_LINK=`curl -s $DL_PAGE | grep "$DL_KEYWORD" | cut -d'"' -f2`
+CURRENT_VER=`echo $CURRENT_LINK | rev | cut -d'/' -f 4 | rev`
+INSTALLED_VER=`find . -name 'server-*.jar' -printf '%f' | cut -d"-" -f 2 | sed -e s/.jar//`
 
-if [ ${INSTALLED_VER} == ${CURRENT_VER} ]; then
+if [ "${INSTALLED_VER}" == "${CURRENT_VER}" ]; then
   echo "Version already matching"
 else
   echo "Local version out of date, updating $INSTALLED_VER to $CURRENT_VER"
@@ -30,9 +30,9 @@ else
     echo $old_jar
     mv $old_jar old-$old_jar
   done
-  curl -s -o $MINECRAFT_LOC/$CURRENT_VER $CURRENT_LINK
+  curl -s -o $MINECRAFT_LOC/server-$CURRENT_VER.jar $CURRENT_LINK
   rm old-minecraft_server*
   INSTALLED_VER=$CURRENT_VER
 fi
 
-java -Xmx2G -Xms2G -jar $INSTALLED_VER nogui
+java -Xmx3G -Xms3G -jar server-$INSTALLED_VER.jar nogui
