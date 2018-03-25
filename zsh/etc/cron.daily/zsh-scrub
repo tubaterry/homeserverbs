@@ -1,0 +1,3 @@
+#!/bin/bash
+
+zpool scrub `zpool list | tr -s " " | cut -d " " -f1 | egrep -v "NAME"`
