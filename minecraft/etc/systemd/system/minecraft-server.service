@@ -1,0 +1,26 @@
+[Unit]
+Description=Minecraft Server
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/minecraft
+PrivateUsers=true # Users Database is not available for within the unit, only root and minecraft is available, everybody else is nobody
+User=minecraft
+Group=minecraft
+ProtectSystem=full # Read only mapping of /usr /boot and /etc
+ProtectHome=true # /home, /root and /run/user seam to be empty from within the unit. It is recommended to enable this setting for all long-running services (in particular network-facing ones).
+
+ExecStart=/bin/sh -c '/opt/minecraft/startminecraft.sh'
+
+ExecReload=/usr/bin/screen -p 0 -S minecraft -X eval 'stuff "reload"\\015'
+
+ExecStop=/usr/bin/screen -p 0 -S minecraft -X eval 'stuff "say SERVER SHUTTING DOWN. Saving map..."\\015'
+ExecStop=/usr/bin/screen -p 0 -S minecraft -X eval 'stuff "save-all"\\015'
+ExecStop=/usr/bin/screen -p 0 -S minecraft -X eval 'stuff "stop"\\015'
+ExecStop=/bin/sleep 10
+
+Restart=on-failure
+RestartSec=60s
+
+[Install]
+WantedBy=multi-user.target
