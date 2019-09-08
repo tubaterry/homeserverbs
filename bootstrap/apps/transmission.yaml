@@ -1,0 +1,119 @@
+#Varous Storages
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transmission-config
+  labels:
+    app: transmission
+spec:
+  storageClassName: microk8s-hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transmission-incomplete
+  labels:
+    app: transmission
+spec:
+  storageClassName: microk8s-hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+---
+
+#Fire up transmission itself
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transmission-deployment
+  labels:
+    app: transmission
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transmission
+  template:
+    metadata:
+      labels:
+        app: transmission
+    spec:
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: transmission-config
+      - name: incomplete
+        persistentVolumeClaim:
+          claimName: transmission-incomplete
+      - name: complete
+        persistentVolumeClaim:
+          claimName: shared-storage
+      containers:
+      - name: transmission-app
+        image: linuxserver/transmission
+        env:
+        - name: TEST
+          value: "Example"
+        - name: USER
+          value: "lockbox"
+        - name: PASS
+          value: "nbChTl99Ebzf1XQb"
+        volumeMounts:
+          - mountPath: "/config"
+            name: config
+          - mountPath: "/downloads/incomplete"
+            name: incomplete
+          - mountPath: "/downloads/complete"
+            name: complete
+        ports:
+          - containerPort: 9091
+            protocol: TCP
+          - containerPort: 51413
+            protocol: TCP
+          - containerPort: 51413
+            protocol: UDP
+        readinessProbe:
+          tcpSocket:
+            port: 9091
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 9091
+          initialDelaySeconds: 15
+          periodSeconds: 20
+---
+
+#Service time
+apiVersion: v1
+kind: Service
+metadata:
+  name: transmission-service
+  labels:
+    app: transmission
+spec:
+  type: NodePort
+  selector:
+    app: transmission
+  ports:
+    - nodePort: 31000
+      name: torrent-web
+      port: 9091
+      targetPort: 9091
+    - nodePort: 31001
+      name: torrent-udp
+      port: 51413
+      targetPort: 51413
+      protocol: UDP
+    - nodePort: 31002
+      name: torrent-tcp
+      port: 51413
+      targetPort: 51413
+      protocol: TCP
