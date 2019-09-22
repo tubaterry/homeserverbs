@@ -5,6 +5,39 @@ metadata:
   labels:
     app: transmission
     app: plex
+    app: filesharing
+spec:
+  storageClassName: microk8s-hostpath
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Gi
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-library-tv
+  labels:
+    app: transmission
+    app: plex
+spec:
+  storageClassName: microk8s-hostpath
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Gi
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-library-movies
+  labels:
+    app: transmission
+    app: plex
 spec:
   storageClassName: microk8s-hostpath
   accessModes:

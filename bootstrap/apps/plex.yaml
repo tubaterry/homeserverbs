@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: transmission-config
+  name: plex-config
   labels:
     app: transmission
 spec:
@@ -16,7 +16,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: transmission-downloads
+  name: transmission-incomplete
   labels:
     app: transmission
 spec:
@@ -25,7 +25,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 500Gi
+      storage: 50Gi
 ---
 
 #Fire up transmission itself
@@ -48,19 +48,13 @@ spec:
       volumes:
       - name: config
         persistentVolumeClaim:
-          claimName: transmission-config
-      - name: downloads
+          claimName: plex-config
+      - name: incomplete
         persistentVolumeClaim:
-          claimName: transmission-downloads
-      - name: shared-storage
+          claimName: transmission-incomplete
+      - name: complete
         persistentVolumeClaim:
           claimName: shared-storage
-      - name: media-library-tv
-        persistentVolumeClaim:
-          claimName: media-library-tv
-      - name: media-library-movies
-        persistentVolumeClaim:
-          claimName: media-library-movies
       containers:
       - name: transmission-app
         image: linuxserver/transmission
@@ -78,20 +72,16 @@ spec:
         volumeMounts:
           - mountPath: "/config"
             name: config
-          - mountPath: "/downloads"
-            name: downloads
-          - mountPath: "/plex/tv"
-            name: media-library-tv
-          - mountPath: "/plex/movies"
-            name: media-library-movies
-          - mountPath: "/shared"
-            name: shared-storage
+          - mountPath: "/downloads/incomplete"
+            name: incomplete
+          - mountPath: "/downloads/complete"
+            name: complete
         ports:
           - containerPort: 9091
             protocol: TCP
-          - containerPort: 51413
+          - containerPort: 31001
             protocol: TCP
-          - containerPort: 51413
+          - containerPort: 31001
             protocol: UDP
         readinessProbe:
           tcpSocket:
@@ -123,11 +113,11 @@ spec:
       targetPort: 9091
     - nodePort: 31001
       name: torrent-udp
-      port: 51413
-      targetPort: 51413
+      port: 31001
+      targetPort: 31001
       protocol: UDP
     - nodePort: 31001
       name: torrent-tcp
-      port: 51413
-      targetPort: 51413
+      port: 31001
+      targetPort: 31001
       protocol: TCP
