@@ -8,6 +8,8 @@ echo "Setting necessary secrets values based on local input."
 
 
 # secrets/transmission-user.yaml
+echo "This sets the transmission web user."
+echo "The secret is stored in k8s."
 echo "Transmission username: "
 read TRANSMISSION_USER
 echo "Transmission password: "
