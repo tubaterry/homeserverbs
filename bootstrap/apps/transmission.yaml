@@ -16,7 +16,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: transmission-downloads
+  name: transmission-incomplete
   labels:
     app: transmission
 spec:
@@ -25,7 +25,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 500Gi
+      storage: 100Gi
 ---
 
 #Fire up transmission itself
@@ -49,9 +49,9 @@ spec:
       - name: config
         persistentVolumeClaim:
           claimName: transmission-config
-      - name: downloads
+      - name: incomplete
         persistentVolumeClaim:
-          claimName: transmission-downloads
+          claimName: transmission-incomplete
       - name: shared-storage
         persistentVolumeClaim:
           claimName: shared-storage
@@ -78,14 +78,14 @@ spec:
         volumeMounts:
           - mountPath: "/config"
             name: config
-          - mountPath: "/downloads"
-            name: downloads
+          - mountPath: "/downloads/incomplete"
+            name: incomplete
+          - mountPath: "/downloads/complete"
+            name: shared-storage
           - mountPath: "/plex/tv"
             name: media-library-tv
           - mountPath: "/plex/movies"
             name: media-library-movies
-          - mountPath: "/shared"
-            name: shared-storage
         ports:
           - containerPort: 9091
             protocol: TCP
@@ -117,16 +117,16 @@ spec:
   selector:
     app: transmission
   ports:
-    - nodePort: 31000
+    - nodePort: 9091
       name: torrent-web
       port: 9091
       targetPort: 9091
-    - nodePort: 31001
+    - nodePort: 51413
       name: torrent-udp
       port: 51413
       targetPort: 51413
       protocol: UDP
-    - nodePort: 31001
+    - nodePort: 51413
       name: torrent-tcp
       port: 51413
       targetPort: 51413
