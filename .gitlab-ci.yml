@@ -1,0 +1,10 @@
+stages:
+  - triggers
+
+trigger_k8s:
+  stage: triggers
+  trigger:
+    include: kubernetes/.gitlab-ci.yml
+  rules:
+    - changes:
+      - kubernetes/*

@@ -46,7 +46,7 @@ spec:
         image: linuxserver/plex
         env:
         - name: VERSION
-          value: docker
+          value: public
         volumeMounts:
           - mountPath: "/config"
             name: config
