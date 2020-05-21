@@ -19,3 +19,13 @@ apps:deploy:
   needs: ["apps:test"]
   script:
     - echo "This job deploys something."
+
+plex:deploy_prod-onprem:
+  stage: deploy
+  script:
+    - echo "Deploy to staging server"
+  environment:
+    name: prod-onprem
+    url: https://staging.example.com
+  only:
+  - master

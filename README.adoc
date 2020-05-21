@@ -2,3 +2,9 @@
 = homeserverbs
 
 Got tired of rebuilding my home server manually every time
+
+== Notes
+
+=== Gitlab CI/CD
+The .gitlab/auto-deploy-values.yaml file is already depreciated - gitlab 12.10 or older.
+It's for a fun combo really: depreciated gitlab plus latest-and-greatest kubernetes
