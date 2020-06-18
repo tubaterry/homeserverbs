@@ -9,8 +9,6 @@ apps:build:
     - echo "This job builds something."
 
 apps:test:
-  variables:
-    EXAMPLE_VAR: DEFAULT_VAL
   stage: test
   needs: ["apps:build"]
   script:
