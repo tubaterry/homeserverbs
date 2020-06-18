@@ -1,6 +1,3 @@
-variables:
-  EXAMPLE_VAR: DEFAULT_VAL
-
 stages:
   - triggers
 
