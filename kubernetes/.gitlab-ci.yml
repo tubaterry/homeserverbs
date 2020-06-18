@@ -13,7 +13,7 @@ apps:test:
   needs: ["apps:build"]
   script:
     - echo "This job tests something."
-    - echo "This is EXAMPLE_VAR: $EXAMPLE_VAR"
+    - echo "This is EXAMPLE_VAR- $EXAMPLE_VAR"
 
 apps:deploy:
   stage: deploy
