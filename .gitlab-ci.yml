@@ -2,6 +2,8 @@ stages:
   - triggers
 
 trigger_k8s:
+  variables:
+    EXAMPLE_VAR: DEFAULT_VAL
   stage: triggers
   trigger:
     include: kubernetes/.gitlab-ci.yml

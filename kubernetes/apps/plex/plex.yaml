@@ -1,0 +1,144 @@
+#Various Storages
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: plex-config
+  labels:
+    app: plex
+spec:
+  storageClassName: microk8s-hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+---
+
+#Fire up transmission itself
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex-deployment
+  labels:
+    app: plex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plex
+  template:
+    metadata:
+      labels:
+        app: plex
+    spec:
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: plex-config
+      - name: tv
+        persistentVolumeClaim:
+          claimName: media-library-tv
+      - name: movies
+        persistentVolumeClaim:
+          claimName: media-library-movies
+      containers:
+      - name: plex-app
+        image: linuxserver/plex
+        env:
+        - name: VERSION
+          value: public
+        volumeMounts:
+          - mountPath: "/config"
+            name: config
+          - mountPath: "/tv"
+            name: tv
+          - mountPath: "/movies"
+            name: movies
+        ports:
+          - containerPort: 32400
+            protocol: TCP
+          - containerPort: 32410
+            protocol: UDP
+          - containerPort: 32412
+            protocol: UDP
+          - containerPort: 32413
+            protocol: UDP
+          - containerPort: 32414
+            protocol: UDP
+          - containerPort: 3005
+            protocol: TCP
+          - containerPort: 8324
+            protocol: TCP
+          - containerPort: 1900
+            protocol: UDP
+          - containerPort: 23469
+            protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: 32400
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        livenessProbe:
+          tcpSocket:
+            port: 32400
+          initialDelaySeconds: 15
+          periodSeconds: 30
+---
+
+#Service time
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex-service
+  labels:
+    app: plex
+spec:
+  type: NodePort
+  selector:
+    app: plex
+  ports:
+    - nodePort: 32400
+      name: plex-main
+      port: 32400
+      targetPort: 32400
+      protocol: TCP
+    - nodePort: 3005
+      name: plex-companion
+      port: 3005
+      targetPort: 3005
+      protocol: TCP
+    - nodePort: 8324
+      name: plex-roku
+      port: 8324
+      targetPort: 8324
+      protocol: TCP
+    - nodePort: 32410
+      name: plex-gdm1
+      port: 32410
+      targetPort: 32410
+      protocol: UDP
+    - nodePort: 32412
+      name: plex-gdm2
+      port: 32412
+      targetPort: 32412
+      protocol: UDP
+    - nodePort: 32413
+      name: plex-gdm3
+      port: 32413
+      targetPort: 32413
+      protocol: UDP
+    - nodePort: 32414
+      name: plex-gdm4
+      port: 32414
+      targetPort: 32414
+      protocol: UDP
+    - nodePort: 32469
+      name: plex-dlna-tcp
+      port: 32469
+      targetPort: 32469
+      protocol: TCP
+    - nodePort: 1900
+      name: plex-dlna-udp
+      port: 1900
+      targetPort: 1900
+      protocol: UDP

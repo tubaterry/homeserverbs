@@ -13,9 +13,20 @@ apps:test:
   needs: ["apps:build"]
   script:
     - echo "This job tests something."
+    - echo "This is EXAMPLE_VAR-  $EXAMPLE_VAR"
 
 apps:deploy:
   stage: deploy
   needs: ["apps:test"]
   script:
     - echo "This job deploys something."
+
+plex:deploy_prod-onprem:
+  stage: deploy
+  script:
+    - echo "Deploy to staging server"
+  environment:
+    name: prod-onprem
+    url: https://staging.example.com
+  only:
+  - master
